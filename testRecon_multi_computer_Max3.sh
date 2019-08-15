@@ -319,6 +319,7 @@ if [ `hostname` == $host ]; then
 # SSH and run on remote machine [beastie01/beastie02]
 else
 	
+	echo
 	echo "rsync stats:"
 	rsync -a --stats ../ ${host}:${wdir}/${patientDir}
 	echo
