@@ -1,6 +1,6 @@
 # Interactive SVR reconstruction scripts
 
-A collection of .bash wrapper scripts for use with the Image Registration Toolkit (IRTK) for volumetric reconstruction of multi-stack fetal brain data.
+A collection of .sh/.bash wrapper scripts for use with the Image Registration Toolkit (IRTK) for volumetric reconstruction of multi-stack fetal brain data.
 
 These scripts are highly specific to the network infrastructure in the Perinatal Imaging & Health department at KCL.
 
@@ -28,6 +28,6 @@ __Possibly more I've forgotten about...__
 
 ## Installation
 
-Not straightforward... 
+Not straightforward to get running... 
 
 If you are a member of PIH, see the included readme.txt for instructions on how to use.
