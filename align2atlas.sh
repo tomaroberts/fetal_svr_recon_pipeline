@@ -23,6 +23,8 @@ echo "ALIGN TO ATLAS"
 echo "-------------------------------"
 echo
 
+fetalAtlasPath=/pnraw01/FetalPreprocessing/fetalAtlas
+
 ### Ask user for GA
 #---------------------------------------------------------------------------------
 echo "Please type the Gestational Age (GA) of the fetus (rounded to nearest number), followed by [ENTER]:"
@@ -42,16 +44,16 @@ echo "-------------------------------------------"
 echo "Manually reorient and Save As man-orient.dof"
 echo "-------------------------------------------"
 
-rview ../fetalAtlas/GA$ga.nii.gz outputSVRvolume.nii.gz
-rreg ../fetalAtlas/GA$ga.nii.gz outputSVRvolume.nii.gz -dofin man-orient.dof -dofout orient.dof
+rview $fetalAtlasPath/GA$ga.nii.gz outputSVRvolume.nii.gz
+rreg $fetalAtlasPath/GA$ga.nii.gz outputSVRvolume.nii.gz -dofin man-orient.dof -dofout orient.dof
 
 echo "-------------------------------------------"
 echo "Check that the registration worked."
 echo "-------------------------------------------"
 echo
 
-rview ../fetalAtlas/GA$ga.nii.gz outputSVRvolume.nii.gz orient.dof
-transformation outputSVRvolume.nii.gz outputSVRvolume_FINAL.nii.gz -target ../fetalAtlas/GA$ga.nii.gz -dofin orient.dof -linear -Sp -1
+rview $fetalAtlasPath/GA$ga.nii.gz outputSVRvolume.nii.gz orient.dof
+transformation outputSVRvolume.nii.gz outputSVRvolume_FINAL.nii.gz -target $fetalAtlasPath/GA$ga.nii.gz -dofin orient.dof -linear -Sp -1
 
 echo "------------------------------------------"
 echo "View the final volume."

@@ -5,21 +5,13 @@
 # Creates a folder in FetalPreprocessing named according to PatientID and scan date.
 #
 # - USAGE: 
-# - Download data from ISDPACS / raw format and copy into Input_Data folder in YOUR user area.
+# - Download data from ISDPACS / raw format and copy into the Input_Data folder
 # - Run createFolder.sh
 #
 # - Asks the user to enter PatientID and scan date
-# - Creates a folder using date (if required) and subfolder based on PatientID
+# - Creates a folder based on this input in the format YYYY_MM_DD_PatientID
 # - Determines datatype, ie: T1/T2/downloaded from ISDPACS/raw format
-# - Copies the data to the ne folder ready for unpacking/SVR reconstruction
-#
-#
-# - UPDATES:
-# - 31/08/2018 
-# - Amended so that script works from Input_Data folder in user's home directory
-# - Solves issue with multiple users requiring communal Input_Data directory
-# - Amended log.txt output to partially-asterisks patientID
-# - Changed script to reflect new Date > PatientID folder structure
+# - Copies the data to this folder ready for unpacking/SVR reconstruction
 #
 # - Tom Roberts, KCL, January 2018
 # - t.roberts@kcl.ac.uk
@@ -27,13 +19,12 @@
 ##################################################################################
 
 
-### Path definitions
-#- path_input    = put zip file from ISDPACS in this folder
-#- path_fetalrep = pnraw fetal reporting folder
+### Path definition
+#- path_input = put zip file from ISDPACS in this folder
 #---------------------------------------------------------------------------------
-#path_input=/pnraw01/FetalPreprocessing/Input_Data
-path_input=~/Input_Data
-path_fetalrep=/pnraw01/FetalPreprocessing/TomFetalRep
+#path_input=/pnraw01/FetalPreprocessing/FetalPreprocessing_TestEnviron/nnu/Reconstruction_Scripts
+path_input=/pnraw01/FetalPreprocessing/Input_Data
+
 
 cd $path_input
 
@@ -102,41 +93,23 @@ done
 
 
 
-### Check/create directories for that day and patient
+### Create folder
 #---------------------------------------------------------------------------------
-cd $path_fetalrep #cd to fetal reporting folder
+cd .. #cd to FetalPreprocessing folder
 
-# check for folder on that day and create if doesn't exist
-dayFolder=$date_year"_"$date_month"_"$date_day
+patfold=$date_year"_"$date_month"_"$date_day"_"$patid1
 
-if [[ ! -d "${dayFolder}" ]];then
-	mkdir "$dayFolder"
+if [[ ! -d "${patfold}" ]];then
+	mkdir "$patfold"
 	
 	echo
-	echo "Folder created with the date: "$dayFolder
+	echo "Folder created with the name: "$patfold
 	echo
-elif [[ -d "${patientFolder}" ]];then
-
-	cd $dayFolder
-fi
-
-cd $dayFolder #enter day folder
-
-
-
-# create patient folder if doesn't exist
-patientFolder=$patid1
-
-if [[ ! -d "${patientFolder}" ]];then
-	mkdir "$patientFolder"
-	
-	echo "Folder created with the name: "$patientFolder
-	echo
-elif [[ -d "${patientFolder}" ]];then
+elif [[ -d "${patfold}" ]];then
 
 	echo
 	echo "######################################################################"
-	echo "Folder already exists with this date and Patient ID!"
+	echo "Folder already exists with this Patient ID and date!"
 	echo "To prevent overwriting any data, this script will exit."
 	echo "Exiting script..."
 	echo "######################################################################"
@@ -144,14 +117,11 @@ elif [[ -d "${patientFolder}" ]];then
 	exit
 fi
 
-# Update log.txt
+#log.txt
 cd $path_input
-patientFolderLength=${#patientFolder}
-
-echo "Input_Data Path = '"$path_input"'" >> log.txt
-echo "Recon Path = '"$path_fetalrep"'" >> log.txt
-echo "Folder Date = '"$dayFolder"'" >> log.txt
-echo "Folder Name = '*****"${patientFolder:5:$patientFolderLength}"'" >> log.txt
+patpath=`pwd`
+echo "Full Folder Path = '"$patpath"'" >> log.txt
+echo "Folder Name = '"$patfold"'" >> log.txt
 
 
 
@@ -205,7 +175,7 @@ fi
 
 
 echo
-echo "Detecting scanner parameters..."
+echo "Detecting..."
 echo
 
 
@@ -233,7 +203,7 @@ if [ $testPHILIPS -ne 0 ]; then
 	numPACKAGES=4
 fi 
 
-#- .RAW recon
+#- Raw recon
 testV4=`ls -1 *V4*.nii 2>/dev/null | wc -l`
 if [ $testV4 -ne 0 ]; then
 	echo "Detected data reconstructed from RAW files." | tee -a log.txt
@@ -287,17 +257,12 @@ echo "Detected Number of Packages = '"$numPACKAGES"'" | tee -a log.txt
 
 
 
-
-
-
-
-
 ### Move Files to Patient Folder
 #---------------------------------------------------------------------------------
 if [ $testV4 -ne 0 ]; then
-	mv *V4*.nii $path_fetalrep/$dayFolder/$patientFolder	
+	mv *V4*.nii ../$patfold	
 elif [ $testPHILIPS -ne 0 ]; then 
-	mv *PHILIPS*.zip $path_fetalrep/$dayFolder/$patientFolder
+	mv *PHILIPS*.zip ../$patfold
 	rm -r *PHILIPS* # removes any folders which were unzipped earlier
 	
 	# ### Extract the NIFTI files from the zip file
@@ -305,17 +270,33 @@ elif [ $testPHILIPS -ne 0 ]; then
 	# rm *PHILIPS*.zip #An alternative here is to keep a copy
 fi
 
-# move log file
-mv log.txt $path_fetalrep/$dayFolder/$patientFolder
+cd ..
+cd $patfold #Patient folder
 
+
+
+
+
+### Copy scripts for completing the rest of the SVR Reconstruction pipeline
+#---------------------------------------------------------------------------------
+#-NB: Might be better to combine all of these into a single script at some point?
+
+cd $path_input
+
+mv log.txt ../$patfold
+# cp createFolder.sh ../$patfold
+# cp convert2stacks.sh ../$patfold
+# cp drawMask.sh ../$patfold
+# cp autoReconstruct.sh ../$patfold
+# cp align2atlas.sh ../$patfold
+# cp runReconPipeline.sh ../$patfold
 
 
 ### Script complete message
 #---------------------------------------------------------------------------------
 echo
 echo "######################################################################"
-echo "Script complete. Stacks saved to:"
-echo $path_fetalrep/$dayFolder/$patientFolder
+echo "Script complete. Stacks saved to: "$patfold
 echo "######################################################################"
 echo
 
