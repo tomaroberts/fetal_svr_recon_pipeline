@@ -326,14 +326,64 @@ if [ `hostname` == $host ]; then
 	# get scan date directory - bit hacky
 	cd ../..; scanDateDir=$(basename `pwd`); cd ${patientDir}/recon
 
+
+	if [ $numReconCycles -gt 1 ]; then
+
 	
+		# run the SVR pipeline for severe motion cases with reconstruction of low resolution template first (SVRTK-based)
+
+		echo "RECONSTRUCTION - CYCLE 1: (low resolution):"
+		
+		cd ${wdir}/${scanDateDir}/${patientDir}/recon; 
+		/pnraw01/FetalPreprocessing/bin/max_jobs.bash ../lowResTemplate.nii.gz \
+										$numStacks \
+										${arrStackNames[*]} \
+										-mask ../$maskName \
+										-remote \
+										-thickness ${arrSliceThickness[*]} \
+										-svr_only \
+										-resolution 1.1 \
+										-structural \
+										-iterations 3
+															
+
+		echo "RECONSTRUCTION - CYCLE 2: (high resolution):"
+															
+		cd ${wdir}/${scanDateDir}/${patientDir}/recon; 
+		/pnraw01/FetalPreprocessing/bin/max_jobs.bash ../outputSVRvolume.nii.gz \
+										$numStacks \
+										${arrStackNames[*]} \
+										-mask ../$maskName \
+										-remote \
+										-thickness ${arrSliceThickness[*]} \
+										-template ../lowResTemplate.nii.gz \
+										-svr_only \
+										-structural \
+										-iterations 3
+
+	else 
+
+		# run the original SVR pipeline (SVRTK-based)
+
+		echo "RECONSTRUCTION:"
+		
+		cd ${wdir}/${scanDateDir}/${patientDir}/recon; 
+		/pnraw01/FetalPreprocessing/bin/max_jobs.bash ../outputSVRvolume.nii.gz \
+										$numStacks \
+										${arrStackNames[*]} \
+										-mask ../$maskName \
+										-remote \
+										-thickness ${arrSliceThickness[*]} \
+										-iterations 3
+		
+	fi 
+
+
 # SSH and run on remote machine [beastie01/beastie02]
 else
 	
 	echo "rsync stats:"
 	rsync -a --stats ../ ${host}:${wdir}/${patientDir}
-
-
 	echo
 	
 
@@ -346,11 +396,11 @@ else
 
 		echo "RECONSTRUCTION - CYCLE 1: (low resolution):"
 
-		ssh -o ServerAliveInterval=60 ${host} "export PATH=/pnraw01/dhcp-reconstructions/FetalPreprocessing/bin:$PATH; cd ${wdir}/${patientDir}/recon; LD_LIBRARY_PATH=/pnraw01/dhcp-reconstructions/FetalPreprocessing/bin/lib /pnraw01/dhcp-reconstructions/FetalPreprocessing/bin/max_jobs_062020.bash ../lowResTemplate.nii.gz \
+		ssh -o ServerAliveInterval=60 ${host} "export PATH=/pnraw01/dhcp-reconstructions/FetalPreprocessing/bin:$PATH; cd ${wdir}/${patientDir}/recon; LD_LIBRARY_PATH=/pnraw01/dhcp-reconstructions/FetalPreprocessing/bin/lib /pnraw01/dhcp-reconstructions/FetalPreprocessing/bin/max_jobs.bash ../lowResTemplate.nii.gz \
 															$numStacks \
 															${arrStackNames[*]} \
 															-mask ../$maskName \
-															-remote
+															-remote \
 															-thickness ${arrSliceThickness[*]} \
 															-svr_only \
 															-resolution 1.1 \
@@ -359,11 +409,11 @@ else
 
 		echo "RECONSTRUCTION - CYCLE 2: (high resolution):"
 
-		ssh -o ServerAliveInterval=60 ${host} "export PATH=/pnraw01/dhcp-reconstructions/FetalPreprocessing/bin:$PATH; cd ${wdir}/${patientDir}/recon; LD_LIBRARY_PATH=/pnraw01/dhcp-reconstructions/FetalPreprocessing/bin/lib /pnraw01/dhcp-reconstructions/FetalPreprocessing/bin/max_jobs_062020.bash ../outputSVRvolume.nii.gz \
+		ssh -o ServerAliveInterval=60 ${host} "export PATH=/pnraw01/dhcp-reconstructions/FetalPreprocessing/bin:$PATH; cd ${wdir}/${patientDir}/recon; LD_LIBRARY_PATH=/pnraw01/dhcp-reconstructions/FetalPreprocessing/bin/lib /pnraw01/dhcp-reconstructions/FetalPreprocessing/bin/max_jobs.bash ../outputSVRvolume.nii.gz \
 															$numStacks \
 															${arrStackNames[*]} \
 															-mask ../$maskName \
-															-remote
+															-remote \
 															-thickness ${arrSliceThickness[*]} \
 															-template ../lowResTemplate.nii.gz \
 															-svr_only \ 
@@ -372,14 +422,15 @@ else
 
 	else 
 
+		# run the original SVR pipeline (SVRTK-based)
+
 		echo "RECONSTRUCTION:"
 
-		# run the original SVR pipeline (SVRTK-based)
-		ssh -o ServerAliveInterval=60 ${host} "export PATH=/pnraw01/dhcp-reconstructions/FetalPreprocessing/bin:$PATH; cd ${wdir}/${patientDir}/recon; LD_LIBRARY_PATH=/pnraw01/dhcp-reconstructions/FetalPreprocessing/bin/lib /pnraw01/dhcp-reconstructions/FetalPreprocessing/bin/max_jobs_062020.bash ../outputSVRvolume.nii.gz \
+		ssh -o ServerAliveInterval=60 ${host} "export PATH=/pnraw01/dhcp-reconstructions/FetalPreprocessing/bin:$PATH; cd ${wdir}/${patientDir}/recon; LD_LIBRARY_PATH=/pnraw01/dhcp-reconstructions/FetalPreprocessing/bin/lib /pnraw01/dhcp-reconstructions/FetalPreprocessing/bin/max_jobs.bash ../outputSVRvolume.nii.gz \
 														$numStacks \
 														${arrStackNames[*]} \
 														-mask ../$maskName \
-														-remote
+														-remote \
 														-thickness ${arrSliceThickness[*]} \
 														-iterations 3"
 		
