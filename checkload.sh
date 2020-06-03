@@ -30,6 +30,14 @@ function report {
     echo `hostname`", load (CPU and I/O): ${average_load} / `nproc`, RAM (${ram}): ${free_ram}G ,/ ${total_ram}G, swap used: ${swap_used}, recons (locfiles): $recons_running ($locfiles) / 2"
 }
 
-report
+e_was_set=${-//[^e]/} # query exit on failure status
+set +e # ignore failure
+problem=`ps -eo ppid,pid,user,stat,pcpu,comm,wchan:32 | grep call_rwsem_down_read_failed`
+[ -z $e_was_set ] && set -e # reset exit status
+if [ -z "$problem" ]; then
+	report
+else
+	echo "`hostname` PROBLEM:, call_rwsem_down_read_failed, REBOOT REQUIRED?"
+fi
 
 exit
