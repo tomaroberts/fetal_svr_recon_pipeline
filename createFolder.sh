@@ -112,6 +112,9 @@ dayFolder=$date_year"_"$date_month"_"$date_day
 if [[ ! -d "${dayFolder}" ]];then
 	mkdir "$dayFolder"
 	
+	# give folder sticky bits permissions, so all users can share directory
+	chmod 775 $dayFolder; chmod +t $dayFolder;
+	
 	echo
 	echo "Folder created with the date: "$dayFolder
 	echo
