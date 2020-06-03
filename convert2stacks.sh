@@ -268,6 +268,23 @@ while [ $d -lt $numVols ] ; do						# loop until hit d'th folder
 	d=`expr $d + 1`
 done
 
+
+#---Rescale stacks to prevent irtk dynamicRange error
+
+echo
+echo "Rescaling stacks ..."
+echo
+
+stackFiles=`ls stack*.nii* | wc -l`
+
+for i in $(seq 1 $stackFiles)
+do
+    rescale stack$i.nii.gz stack$i.nii.gz 0 300
+done
+
+echo
+echo "Rescaling complete."
+
 	
 #---Save file containing parameters for reconstruction
 echo "Slice Thickness Array = "${SLICETHICKNESS[*]} >> log.txt
