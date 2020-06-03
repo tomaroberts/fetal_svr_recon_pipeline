@@ -198,11 +198,13 @@ tempStackNames=(${arrStackNames[@]/$targetStack})
 arrStackNames=("$targetStack" ${tempStackNames[@]})
 
 
-### Get number of Iterations
+### Set Number of Iterations
 #---------------------------------------------------------------------------------
 echo
 echo -e "Please type number of iterations (default = 3) you would like to run, followed by [ENTER]:"
 read numIterations
+
+
 ### Sanity check for User
 #---------------------------------------------------------------------------------
 echo
@@ -267,9 +269,9 @@ done | column -t -s','
 	echo "Please select a computer on which to run the reconstruction."
 	echo "Lower CPU load and lower RAM usage is better."
 	echo "Rule of thumb: beastie01 or beastie02 are a good choice as they have plenty of RAM."
-	echo "[0 = gpubeastie01-pc]"
-	echo "[1 = beastie01]"
-	echo "[2 = beastie02]"
+	for (( ihost=0; ihost<${#hosts[@]}; ihost++ )); do
+		echo "[${ihost} = ${hosts[ihost]}]"
+	done
 	echo "Type the number of the computer you would like to use: "
 	echo
 
@@ -310,13 +312,17 @@ echo
 
 # Run on local machine [gpubeastie01-pc]
 if [ `hostname` == $host ]; then
-	cd ${wdir}/${patientDir}/recon; /pnraw01/FetalPreprocessing/bin/max_jobs.bash ../outputSVRvolume.nii.gz \
-																					$numStacks \
-																					${arrStackNames[*]} \
-																					-mask ../$maskName \
-																					-packages ${arrPackages[*]} \
-																					-thickness ${arrSliceThickness[*]} \
-																					-iterations $numIterations
+
+	# get scan date directory - bit hacky
+	cd ../..; scanDateDir=$(basename `pwd`); cd ${patientDir}/recon
+
+	cd ${wdir}/${scanDateDir}/${patientDir}/recon; /pnraw01/FetalPreprocessing/bin/max_jobs.bash ../outputSVRvolume.nii.gz \
+																								$numStacks \
+																								${arrStackNames[*]} \
+																								-mask ../$maskName \
+																								-packages ${arrPackages[*]} \
+																								-thickness ${arrSliceThickness[*]} \
+																								-iterations $numIterations
 # SSH and run on remote machine [beastie01/beastie02]
 else
 	
