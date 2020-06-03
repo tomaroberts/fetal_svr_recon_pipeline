@@ -28,7 +28,7 @@ while true; do
 							# -thickness ${arrSliceThickness[*]} \
 							# -iterations $numIterations
 
-			echo "_____Reconstruction complete [within max_jobs.bash]_____"
+			echo "Reconstruction complete within max_jobs.bash ... "
 	 
 		   rm -f "$lockfile"
 		   trap - INT TERM EXIT
