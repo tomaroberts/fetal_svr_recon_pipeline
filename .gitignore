@@ -1,2 +1,4 @@
 # Ignore these folders
 IRTK_corrections/
+useful_programs/
+.ipynb_checkpoints
