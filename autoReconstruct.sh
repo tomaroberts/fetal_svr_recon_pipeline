@@ -416,7 +416,7 @@ else
 															-remote \
 															-thickness ${arrSliceThickness[*]} \
 															-template ../lowResTemplate.nii.gz \
-															-svr_only \ 
+															-svr_only \
 															-structural \
 															-iterations 3"
 
