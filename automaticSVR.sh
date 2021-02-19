@@ -363,10 +363,10 @@ while ! $isReconstructed; do
 	
 done
 
-### Move / clean up
-mv $path_autoSVRrecon_output/$dayFolder"_"$patientFolder-SVR-output.nii.gz $path_fetalrep/$dayFolder/$patientFolder
+### Copy / clean up
+cp $path_autoSVRrecon_output/$dayFolder"_"$patientFolder-SVR-output.nii.gz $path_fetalrep/$dayFolder/$patientFolder
 mv $path_fetalrep/$dayFolder/$patientFolder/$dayFolder"_"$patientFolder-SVR-output.nii.gz $path_fetalrep/$dayFolder/$patientFolder/outputSVRvolume.nii.gz
-rm -r $path_autoSVRrecon_patientFolder
+#rm -r $path_autoSVRrecon_patientFolder
 
 
 echo "-------------------------------"
