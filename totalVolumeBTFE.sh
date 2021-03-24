@@ -46,7 +46,7 @@ fi
 echo "Please type the Patient ID, followed by [ENTER]:"
 read patid1
 
-patid1=${patid1}_totalvolume
+patid1=${patid1}_FetalVolume
 
 
 clear
@@ -54,7 +54,7 @@ clear
 echo -e "Please type the Patient ID once more, followed by [ENTER]:"
 read patid2
 
-patid2=${patid2}_totalvolume
+patid2=${patid2}_FetalVolume
 
 
 ### Check Patient ID entered correctly
@@ -154,6 +154,7 @@ fi
 cd ${path_input}
 patientFolderLength=${#patientFolder}
 
+echo "--- totalVolumeBTFE.sh --- Automatic fetal body segmentation ---" >> log.txt
 echo "Input_Data Path = '"${path_input}"'" >> log.txt
 echo "Recon Path = '"${path_fetalrep}"'" >> log.txt
 echo "Folder Date = '"${dayFolder}"'" >> log.txt
@@ -209,7 +210,10 @@ fi
 ### Move .nii Files to Patient Folder
 #---------------------------------------------------------------------------------
 
-find . -name "*.nii*" -exec cp {} ${path_fetalrep}/${dayFolder}/${patientFolder} \; 
+find . -name "*.nii*" -exec mv {} ${path_fetalrep}/${dayFolder}/${patientFolder} \; 
+
+# move log file
+mv log.txt ${path_fetalrep}/${dayFolder}/${patientFolder} 
 	
 ls ${path_fetalrep}/${dayFolder}/${patientFolder} 
 
@@ -286,6 +290,7 @@ IFS=$'\n' read -rd '' -a all_stacks <<<"$in_stack_names"
 
 ### Copy / clean up
 cp ${path_autoSegmentation_output}/${dayFolder}_${id_transfer}-segmentations/*fetus* ${path_fetalrep}/${dayFolder}/${patientFolder}/
+cp ${path_autoSegmentation_output}/${dayFolder}_${id_transfer}-segmentations/*placenta* ${path_fetalrep}/${dayFolder}/${patientFolder}/ 
 #rm -r ${path_autoSegmentation_patientFolder}
 #rm -r ${checkOutputFolder}
 

@@ -149,6 +149,7 @@ fi
 cd $path_input
 patientFolderLength=${#patientFolder}
 
+echo "--- automaticSVR.sh --- Automatic brain segmentation ---" >> log.txt
 echo "Input_Data Path = '"$path_input"'" >> log.txt
 echo "Recon Path = '"$path_fetalrep"'" >> log.txt
 echo "Folder Date = '"$dayFolder"'" >> log.txt
